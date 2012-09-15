@@ -37,15 +37,14 @@ function gpxpress_gpxpress_shortcode_handler($atts) {
     // Create a div to show the map.
     $ret = '<div id="gpxpressMap" style="width: ' . $width . 'px; height: ' . $height .'px">&#160;</div>';
 
-    // Get the latlongs and write them to a variable
-    // TODO: Just set a global which the footer script grabs
+    // Parse the latlongs from the GPX and save them to a global variable to be used in the JS later.
     $pairs = array();
     $xml = simplexml_load_file($src);
     foreach ($xml->trk->trkseg->trkpt as $trkpt) {
         $pairs[] = '[' . $trkpt['lat'] . ',' . $trkpt['lon'] . ']';
     }
+    global $latlong;
     $latlong = '[' . implode(',', $pairs) . ']';
-    $ret .= "<script type='text/javascript'>var latlong = $latlong;</script>";
 
     return $ret;
 }

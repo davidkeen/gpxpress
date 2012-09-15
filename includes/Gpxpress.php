@@ -46,7 +46,8 @@ class Gpxpress
 
     function wp_footer() {
 
-        // TODO: use a global var
+        // String containing a JS array of latlong pairs, parsed from the GPX file in the shortcode handler.
+        global $latlong;
 
         $options = get_option('gpxpress_options');
 
@@ -59,7 +60,7 @@ class Gpxpress
                 maxZoom: 18,
                 subdomains: ["otile1","otile2","otile3","otile4"]
             }).addTo(map);
-            var polyline = L.polyline(latlong, {color: "' . $options['path_colour'] . '"}).addTo(map);
+            var polyline = L.polyline(' . $latlong . ', {color: "' . $options['path_colour'] . '"}).addTo(map);
 
             // zoom the map to the polyline
             map.fitBounds(polyline.getBounds());
