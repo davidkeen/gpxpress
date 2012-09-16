@@ -3,7 +3,7 @@ Contributors: davidkeen
 Tags: geo, gpx, navigation, maps
 Requires at least: 3.0
 Tested up to: 3.4.2
-Stable tag:
+Stable tag: 0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
