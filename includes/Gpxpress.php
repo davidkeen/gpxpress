@@ -20,6 +20,9 @@
 
 class Gpxpress
 {
+    /**
+     * register_activation_hook callback.
+     */
     function on_activate() {
 
         $defaultOptions = array(
@@ -36,6 +39,9 @@ class Gpxpress
         update_option('gpxpress_options', $options);
     }
 
+    /**
+     * wp_enqueue_scripts action callback.
+     */
     function include_javascript() {
         wp_register_style('leaflet-css', 'http://cdn.leafletjs.com/leaflet-0.4/leaflet.css');
         wp_enqueue_style('leaflet-css');
@@ -44,6 +50,11 @@ class Gpxpress
         wp_enqueue_script('leaflet-js');
     }
 
+    /**
+     * wp_footer action callback.
+     *
+     * Outputs the javascript to show the map.
+     */
     function wp_footer() {
 
         // String containing a JS array of latlong pairs, parsed from the GPX file in the shortcode handler.
@@ -68,12 +79,21 @@ class Gpxpress
             </script>';
     }
 
+    /**
+     * Filter callback to add a link to the plugin's settings.
+     *
+     * @param $links
+     * @return array
+     */
     function add_settings_link($links) {
         $settings_link = '<a href="options-general.php?page=gpxpress">' . __("Settings", "GPXpress") . '</a>';
         array_unshift($links, $settings_link);
         return $links;
     }
 
+    /**
+     * admin_menu action callback.
+     */
     function admin_menu() {
         global $gpxpress;
         add_options_page('GPXpress Options', 'GPXpress', 'manage_options', 'gpxpress', array($gpxpress, 'options_page'));
@@ -110,6 +130,9 @@ class Gpxpress
             </div>';
     }
 
+    /**
+     * admin_init action callback.
+     */
     function admin_init() {
         global $gpxpress;
 
