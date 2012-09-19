@@ -44,3 +44,4 @@ add_action('admin_init', array($gpxpress, 'admin_init'));
 // Filters
 $plugin = plugin_basename(__FILE__);
 add_filter("plugin_action_links_{$plugin}", array($gpxpress, 'add_settings_link'));
+add_filter("upload_mimes", array($gpxpress, 'add_gpx_mime'));

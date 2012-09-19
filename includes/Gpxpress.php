@@ -80,6 +80,21 @@ class Gpxpress
     }
 
     /**
+     * Filter callback to allow .gpx file uploads.
+     *
+     * @param array $existing_mimes the existing mime types.
+     * @return array the allowed mime types.
+     */
+    function add_gpx_mime($existing_mimes = array()) {
+
+        // Add file extension 'extension' with mime type 'mime/type'
+        $existing_mimes['gpx'] = 'application/gpx+xml';
+
+        // and return the new full result
+        return $existing_mimes;
+    }
+
+    /**
      * Filter callback to add a link to the plugin's settings.
      *
      * @param $links
