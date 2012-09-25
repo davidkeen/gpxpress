@@ -13,10 +13,12 @@ WordPress plugin to display GPX tracks.
 
 This plugin uses the [Leaflet](http://leaflet.cloudmade.com) JavaScript library and tiles from the [Open MapQuest](http://open.mapquest.co.uk) project to display beautiful maps of GPX tracks.
 
+http://davidkeen.github.com/gpxpress/
+
 == Installation ==
 
 1.  Extract the zip file and drop the contents in the wp-content/plugins/ directory of your WordPress installation.
-2.  Activate the plugin from Plugins page.
+2.  Activate the plugin from the Plugins page.
 3.  Go to the plugin settings page and choose the colour of your tracks. This may be any valid HTML colour code (default is 'red').
 
 To add a map to a post:
