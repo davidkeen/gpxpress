@@ -20,58 +20,74 @@
 
 class Gpxpress
 {
+    // The name of the div containing the map.
+    const MAP_DIV = 'gpxpressMap';
+
+    // MapQuest tile layer
+    const OMQ_TILE_LAYER = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png';
+    const OMQ_ATTRIBUTION = 'Data, imagery and map information provided by <a href=\"http://open.mapquest.co.uk\" target=\"_blank\">MapQuest</a>';
+    const OMQ_SUBDOMAINS = '["otile1","otile2","otile3","otile4"]';
+
+    // String containing a JS array of latlong pairs, parsed from the GPX file in the shortcode handler.
+    // Format: [[12.34,98.76],[56.78,54.32],...]
+    private $latlong = '';
+
     /**
-     * register_activation_hook callback.
+     * The register_activation_hook callback.
+     * This method is run when the plugin is activated.
      */
-    function on_activate() {
+    public function on_activate() {
 
-        $defaultOptions = array(
-            'path_colour' => 'red');
-        add_option('gpxpress_options', $defaultOptions);
+        $defaultOptions = array('path_colour' => 'red');
 
-        // Check we have the correct values if the option already existed.
-        $options = get_option('gpxpress_options');
-        foreach ($defaultOptions as $key => $val) {
-            if (!isset($options[$key]) ) {
-                $options[$key] = $defaultOptions[$key];
+        // Try to set the option (will return false if it already exists)
+        if (!add_option('gpxpress_options', $defaultOptions)) {
+
+            // The option was already set. Make sure any *new* default values are added set.
+            $options = get_option('gpxpress_options');
+            foreach ($defaultOptions as $key => $val) {
+                if (!isset($options[$key]) ) {
+                    $options[$key] = $defaultOptions[$key];
+                }
             }
+            update_option('gpxpress_options', $options);
         }
-        update_option('gpxpress_options', $options);
     }
 
     /**
-     * wp_enqueue_scripts action callback.
+     * The wp_enqueue_scripts action callback.
+     * This is the hook to use when enqueuing items that are meant to appear on the front end.
+     * Despite the name, it is used for enqueuing both scripts and styles.
      */
-    function include_javascript() {
+    public function wp_enqueue_scripts() {
+
+        // Styles
         wp_register_style('leaflet-css', 'http://cdn.leafletjs.com/leaflet-0.4/leaflet.css');
         wp_enqueue_style('leaflet-css');
 
+        // Scripts
         wp_register_script('leaflet-js', 'http://cdn.leafletjs.com/leaflet-0.4/leaflet.js');
         wp_enqueue_script('leaflet-js');
     }
 
     /**
-     * wp_footer action callback.
+     * The wp_footer action callback.
      *
      * Outputs the javascript to show the map.
      */
-    function wp_footer() {
-
-        // String containing a JS array of latlong pairs, parsed from the GPX file in the shortcode handler.
-        global $latlong;
-
+    public function wp_footer() {
         $options = get_option('gpxpress_options');
 
         echo '
             <script type="text/javascript">
             //<![CDATA[
-            var map = L.map("gpxpressMap");
-            L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png", {
-                attribution: "Data, imagery and map information provided by <a href=\"http://open.mapquest.co.uk\" target=\"_blank\">MapQuest</a>",
+            var map = L.map("' . self::MAP_DIV . '");
+            L.tileLayer("' . self::OMQ_TILE_LAYER . '", {
+                attribution: "' . self::OMQ_ATTRIBUTION . '",
                 maxZoom: 18,
-                subdomains: ["otile1","otile2","otile3","otile4"]
+                subdomains: ' . self::OMQ_SUBDOMAINS . '
             }).addTo(map);
-            var polyline = L.polyline(' . $latlong . ', {color: "' . $options['path_colour'] . '"}).addTo(map);
+            var polyline = L.polyline(' . $this->latlong . ', {color: "' . $options['path_colour'] . '"}).addTo(map);
 
             // zoom the map to the polyline
             map.fitBounds(polyline.getBounds());
@@ -85,7 +101,7 @@ class Gpxpress
      * @param array $existing_mimes the existing mime types.
      * @return array the allowed mime types.
      */
-    function add_gpx_mime($existing_mimes = array()) {
+    public function add_gpx_mime($existing_mimes = array()) {
 
         // Add file extension 'extension' with mime type 'mime/type'
         $existing_mimes['gpx'] = 'application/gpx+xml';
@@ -95,12 +111,49 @@ class Gpxpress
     }
 
     /**
+     * The [gpxpress] shortcode handler.
+     *
+     * This shortcode inserts a map of the GPX track.
+     * The 'src' parameter should be used to give the url containing the GPX data.
+     * The 'width' and 'height' parameters set the width and height of the map in pixels. (Default 600x400)
+     * Eg: [gpxpress src=http://www.example.com/my_file.gpx width=600 height=400]
+     *
+     * @param string $atts an associative array of attributes.
+     * @return string the shortcode output to be inserted into the post body in place of the shortcode itself.
+     */
+    public function gpxpress_shortcode($atts) {
+
+        // Extract the shortcode arguments into local variables named for the attribute keys (setting defaults as required)
+        $defaults = array(
+            'src' => null,
+            'width' => 600,
+            'height' => 400);
+        extract(shortcode_atts($defaults, $atts));
+
+        // Create a div to show the map.
+        $ret = '<div id="' . self::MAP_DIV .'" style="width: ' . $width . 'px; height: ' . $height .'px">&#160;</div>';
+
+        // Parse the latlongs from the GPX and save them to a global variable to be used in the JS later.
+        // String format: [[12.34,98.76],[56.78,54.32]]
+        $pairs = array();
+        $xml = simplexml_load_file($src);
+        foreach ($xml->trk->trkseg->trkpt as $trkpt) {
+            $pairs[] = '[' . $trkpt['lat'] . ',' . $trkpt['lon'] . ']';
+        }
+        $this->latlong = '[' . implode(',', $pairs) . ']';
+
+        return $ret;
+    }
+
+    // TODO: Move admin stuff into separate class.
+
+    /**
      * Filter callback to add a link to the plugin's settings.
      *
      * @param $links
      * @return array
      */
-    function add_settings_link($links) {
+    public function add_settings_link($links) {
         $settings_link = '<a href="options-general.php?page=gpxpress">' . __("Settings", "GPXpress") . '</a>';
         array_unshift($links, $settings_link);
         return $links;
@@ -109,9 +162,8 @@ class Gpxpress
     /**
      * admin_menu action callback.
      */
-    function admin_menu() {
-        global $gpxpress;
-        add_options_page('GPXpress Options', 'GPXpress', 'manage_options', 'gpxpress', array($gpxpress, 'options_page'));
+    public function admin_menu() {
+        add_options_page('GPXpress Options', 'GPXpress', 'manage_options', 'gpxpress', array($this, 'options_page'));
     }
 
     /**
@@ -119,9 +171,9 @@ class Gpxpress
      * See: http://ottopress.com/2009/wordpress-settings-api-tutorial/
      * And: http://codex.wordpress.org/Settings_API
      */
-    function options_page() {
+    public function options_page() {
 
-        // AUthorised?
+        // Authorised?
         if (!current_user_can('manage_options')) {
             wp_die(__('You do not have sufficient permissions to access this page.'));
         }
@@ -148,15 +200,14 @@ class Gpxpress
     /**
      * admin_init action callback.
      */
-    function admin_init() {
-        global $gpxpress;
+    public function admin_init() {
 
         // Register a setting and its sanitization callback.
         // Parameters are:
         // $option_group - A settings group name. Must exist prior to the register_setting call. (settings_fields() call)
         // $option_name - The name of an option to sanitize and save.
         // $sanitize_callback - A callback function that sanitizes the option's value.
-        register_setting('gpxpress-options', 'gpxpress_options', array($gpxpress, 'validate_options'));
+        register_setting('gpxpress-options', 'gpxpress_options', array($this, 'validate_options'));
 
         // Add the 'General Settings' section to the options page.
         // Parameters are:
@@ -164,7 +215,7 @@ class Gpxpress
         // $title - Title of the section.
         // $callback - Function that fills the section with the desired content. The function should echo its output.
         // $page - The type of settings page on which to show the section (general, reading, writing, media etc.)
-        add_settings_section('general', 'General Settings', array($gpxpress, 'general_section_content'), 'gpxpress');
+        add_settings_section('general', 'General Settings', array($this, 'general_section_content'), 'gpxpress');
 
 
         // Register the options
@@ -177,13 +228,13 @@ class Gpxpress
         // $section - The section of the settings page in which to show the box (default or a section you added with add_settings_section,
         //            look at the page in the source to see what the existing ones are.)
         // $args - Additional arguments
-    	add_settings_field('path_colour', 'Path colour', array($gpxpress, 'path_colour_input'), 'gpxpress', 'general');
+    	add_settings_field('path_colour', 'Path colour', array($this, 'path_colour_input'), 'gpxpress', 'general');
     }
 
     /**
      * Fills the section with the desired content. The function should echo its output.
      */
-    function general_section_content() {
+    public function general_section_content() {
         // Nothing to see here.
     }
 
@@ -196,13 +247,13 @@ class Gpxpress
      * TODO: Genericise this to take a name param.
      *
      */
-    function path_colour_input() {
+    public function path_colour_input() {
         $options = get_option('gpxpress_options');
     	echo "<input id='path_colour' name='gpxpress_options[path_colour]' size='40' type='text' value='{$options['path_colour']}' />";
     }
 
     // TODO
-    function validate_options($input) {
+    public function validate_options($input) {
         $options = get_option('gpxpress_options');
 
         // Validate path colour

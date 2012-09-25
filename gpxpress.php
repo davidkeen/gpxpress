@@ -27,21 +27,28 @@
  * Author URI: http://davidkeen.com
 */
 
-include_once plugin_dir_path(__FILE__) . 'includes/shortcodes.php';
-include_once plugin_dir_path(__FILE__) . 'includes/Gpxpress.php';
+// Constants
+define('GPXPRESS_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('PLUGIN_BASENAME', plugin_basename(__FILE__));
 
+// Includes
+include_once GPXPRESS_PLUGIN_DIR . 'includes/Gpxpress.php';
+
+// The main plugin class
 $gpxpress = new Gpxpress();
 
 // Hooks
 register_activation_hook(__FILE__, array($gpxpress, 'on_activate'));
 
 // Actions
-add_action('wp_enqueue_scripts', array($gpxpress, 'include_javascript'));
+add_action('wp_enqueue_scripts', array($gpxpress, 'wp_enqueue_scripts'));
 add_action('wp_footer', array($gpxpress, 'wp_footer'));
 add_action('admin_menu', array($gpxpress, 'admin_menu'));
 add_action('admin_init', array($gpxpress, 'admin_init'));
 
 // Filters
-$plugin = plugin_basename(__FILE__);
-add_filter("plugin_action_links_{$plugin}", array($gpxpress, 'add_settings_link'));
-add_filter("upload_mimes", array($gpxpress, 'add_gpx_mime'));
+add_filter('plugin_action_links_' . PLUGIN_BASENAME, array($gpxpress, 'add_settings_link'));
+add_filter('upload_mimes', array($gpxpress, 'add_gpx_mime'));
+
+// Shortcodes
+add_shortcode('gpxpress', array($gpxpress, 'gpxpress_shortcode'));
