@@ -20,9 +20,9 @@
 
 /*
  * Plugin Name: GPXpress
- * Plugin URI: https://github.com/davidkeen/gpxpress
+ * Plugin URI: http://davidkeen.github.com/gpxpress/
  * Description: Wordpress plugin to display GPX tracks.
- * Version: 0.1
+ * Version: 1.0
  * Author: David Keen
  * Author URI: http://davidkeen.com
 */
