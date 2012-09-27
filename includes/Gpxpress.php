@@ -38,7 +38,7 @@ class Gpxpress
      */
     public function on_activate() {
 
-        $defaultOptions = array('path_colour' => 'magenta');
+        $defaultOptions = array('path_colour' => 'magenta', 'width' => 600, 'height' => 400);
 
         // Try to set the option (will return false if it already exists)
         if (!add_option('gpxpress_options', $defaultOptions)) {
@@ -124,10 +124,11 @@ class Gpxpress
     public function gpxpress_shortcode($atts) {
 
         // Extract the shortcode arguments into local variables named for the attribute keys (setting defaults as required)
+        $options = get_option('gpxpress_options');
         $defaults = array(
             'src' => null,
-            'width' => 600,
-            'height' => 400);
+            'width' => $options['width'],
+            'height' => $options['height']);
         extract(shortcode_atts($defaults, $atts));
 
         // Create a div to show the map.
@@ -146,6 +147,42 @@ class Gpxpress
     }
 
     // TODO: Move admin stuff into separate class.
+
+    /**
+     * admin_init action callback.
+     */
+    public function admin_init() {
+
+        // Register a setting and its sanitization callback.
+        // Parameters are:
+        // $option_group - A settings group name. Must exist prior to the register_setting call. (settings_fields() call)
+        // $option_name - The name of an option to sanitize and save.
+        // $sanitize_callback - A callback function that sanitizes the option's value.
+        register_setting('gpxpress-options', 'gpxpress_options', array($this, 'validate_options'));
+
+        // Add the 'General Settings' section to the options page.
+        // Parameters are:
+        // $id - String for use in the 'id' attribute of tags.
+        // $title - Title of the section.
+        // $callback - Function that fills the section with the desired content. The function should echo its output.
+        // $page - The type of settings page on which to show the section (general, reading, writing, media etc.)
+        add_settings_section('general', 'General Settings', array($this, 'general_section_content'), 'gpxpress');
+
+
+        // Register the options
+        // Parameters are:
+        // $id - String for use in the 'id' attribute of tags.
+        // $title - Title of the field.
+        // $callback - Function that fills the field with the desired inputs as part of the larger form.
+        //             Name and id of the input should match the $id given to this function. The function should echo its output.
+        // $page - The type of settings page on which to show the field (general, reading, writing, ...).
+        // $section - The section of the settings page in which to show the box (default or a section you added with add_settings_section,
+        //            look at the page in the source to see what the existing ones are.)
+        // $args - Additional arguments
+        add_settings_field('path_colour', 'Path colour', array($this, 'path_colour_input'), 'gpxpress', 'general');
+        add_settings_field('width', 'Map width', array($this, 'width_input'), 'gpxpress', 'general');
+        add_settings_field('height', 'Map height', array($this, 'height_input'), 'gpxpress', 'general');
+    }
 
     /**
      * Filter callback to add a link to the plugin's settings.
@@ -198,40 +235,6 @@ class Gpxpress
     }
 
     /**
-     * admin_init action callback.
-     */
-    public function admin_init() {
-
-        // Register a setting and its sanitization callback.
-        // Parameters are:
-        // $option_group - A settings group name. Must exist prior to the register_setting call. (settings_fields() call)
-        // $option_name - The name of an option to sanitize and save.
-        // $sanitize_callback - A callback function that sanitizes the option's value.
-        register_setting('gpxpress-options', 'gpxpress_options', array($this, 'validate_options'));
-
-        // Add the 'General Settings' section to the options page.
-        // Parameters are:
-        // $id - String for use in the 'id' attribute of tags.
-        // $title - Title of the section.
-        // $callback - Function that fills the section with the desired content. The function should echo its output.
-        // $page - The type of settings page on which to show the section (general, reading, writing, media etc.)
-        add_settings_section('general', 'General Settings', array($this, 'general_section_content'), 'gpxpress');
-
-
-        // Register the options
-        // Parameters are:
-        // $id - String for use in the 'id' attribute of tags.
-        // $title - Title of the field.
-        // $callback - Function that fills the field with the desired inputs as part of the larger form.
-        //             Name and id of the input should match the $id given to this function. The function should echo its output.
-        // $page - The type of settings page on which to show the field (general, reading, writing, ...).
-        // $section - The section of the settings page in which to show the box (default or a section you added with add_settings_section,
-        //            look at the page in the source to see what the existing ones are.)
-        // $args - Additional arguments
-    	add_settings_field('path_colour', 'Path colour', array($this, 'path_colour_input'), 'gpxpress', 'general');
-    }
-
-    /**
      * Fills the section with the desired content. The function should echo its output.
      */
     public function general_section_content() {
@@ -243,21 +246,39 @@ class Gpxpress
      * Name and id of the input should match the $id given to this function. The function should echo its output.
      *
      * Name value must start with the same as the id used in register_setting.
-     *
-     * TODO: Genericise this to take a name param.
-     *
      */
     public function path_colour_input() {
         $options = get_option('gpxpress_options');
     	echo "<input id='path_colour' name='gpxpress_options[path_colour]' size='40' type='text' value='{$options['path_colour']}' />";
     }
 
-    // TODO
+    public function width_input() {
+        $options = get_option('gpxpress_options');
+        echo "<input id='width' name='gpxpress_options[width]' size='40' type='text' value='{$options['width']}' />";
+    }
+
+    public function height_input() {
+        $options = get_option('gpxpress_options');
+        echo "<input id='height' name='gpxpress_options[height]' size='40' type='text' value='{$options['height']}' />";
+    }
+
     public function validate_options($input) {
         $options = get_option('gpxpress_options');
 
         // Validate path colour
         $options['path_colour'] = $input['path_colour'];
+
+        // Validate width and height
+        if ($input['width'] < 0) {
+            $options['width'] = 0;
+        } else {
+            $options['width'] = $input['width'];
+        }
+        if ($input['height'] < 0) {
+            $options['height'] = 0;
+        } else {
+            $options['height'] = $input['height'];
+        }
 
         return $options;
     }
