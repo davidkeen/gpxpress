@@ -19,7 +19,7 @@ http://davidkeen.github.com/gpxpress/
 
 1.  Extract the zip file and drop the contents in the wp-content/plugins/ directory of your WordPress installation.
 2.  Activate the plugin from the Plugins page.
-3.  Go to the plugin settings page and choose the colour of your tracks. This may be any valid HTML colour code (default is 'red').
+3.  Go to the plugin settings page and choose the colour of your tracks. This may be any valid HTML colour code (default is 'magenta').
 
 To add a map to a post:
 
