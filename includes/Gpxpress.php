@@ -38,7 +38,7 @@ class Gpxpress
      */
     public function on_activate() {
 
-        $defaultOptions = array('path_colour' => 'red');
+        $defaultOptions = array('path_colour' => 'magenta');
 
         // Try to set the option (will return false if it already exists)
         if (!add_option('gpxpress_options', $defaultOptions)) {
