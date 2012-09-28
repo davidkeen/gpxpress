@@ -1,6 +1,6 @@
 === GPXpress ===
 Contributors: davidkeen
-Tags: geo, gpx, navigation, maps
+Tags: geo, gpx, gps, navigation, maps
 Requires at least: 3.0
 Tested up to: 3.4.2
 Stable tag: 1.0
