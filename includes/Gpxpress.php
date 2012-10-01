@@ -32,25 +32,34 @@ class Gpxpress
     // Format: [[12.34,98.76],[56.78,54.32],...]
     private $latlong = '';
 
-    /**
-     * The register_activation_hook callback.
-     * This method is run when the plugin is activated.
-     */
-    public function on_activate() {
+    private $defaultOptions = array(
+        'path_colour' => 'magenta',
+        'width' => 600,
+        'height' => 400);
+    private $options;
 
-        $defaultOptions = array('path_colour' => 'magenta', 'width' => 600, 'height' => 400);
+    public function __construct() {
 
-        // Try to set the option (will return false if it already exists)
-        if (!add_option('gpxpress_options', $defaultOptions)) {
+        // Set up the options array
+        $this->options = get_option('gpxpress_options');
+        if (!is_array($this->options)) {
 
-            // The option was already set. Make sure any *new* default values are added set.
-            $options = get_option('gpxpress_options');
-            foreach ($defaultOptions as $key => $val) {
-                if (!isset($options[$key]) ) {
-                    $options[$key] = $defaultOptions[$key];
+            // We don't have any options set yet.
+            $this->options = $this->defaultOptions;
+
+            // Save them to the DB.
+            update_option('gpxpress_options', $this->options);
+        } else if (count(array_diff_key($this->defaultOptions, $this->options)) > 0) {
+
+            // The option was set but we don't have all the option values.
+            foreach ($this->defaultOptions as $key => $val) {
+                if (!isset($this->options[$key]) ) {
+                    $this->options[$key] = $this->defaultOptions[$key];
                 }
             }
-            update_option('gpxpress_options', $options);
+
+            // Save them to the DB.
+            update_option('gpxpress_options', $this->options);
         }
     }
 
@@ -76,7 +85,6 @@ class Gpxpress
      * Outputs the javascript to show the map.
      */
     public function wp_footer() {
-        $options = get_option('gpxpress_options');
 
         echo '
             <script type="text/javascript">
@@ -87,7 +95,7 @@ class Gpxpress
                 maxZoom: 18,
                 subdomains: ' . self::OMQ_SUBDOMAINS . '
             }).addTo(map);
-            var polyline = L.polyline(' . $this->latlong . ', {color: "' . $options['path_colour'] . '"}).addTo(map);
+            var polyline = L.polyline(' . $this->latlong . ', {color: "' . $this->options['path_colour'] . '"}).addTo(map);
 
             // zoom the map to the polyline
             map.fitBounds(polyline.getBounds());
@@ -124,11 +132,10 @@ class Gpxpress
     public function gpxpress_shortcode($atts) {
 
         // Extract the shortcode arguments into local variables named for the attribute keys (setting defaults as required)
-        $options = get_option('gpxpress_options');
         $defaults = array(
             'src' => null,
-            'width' => $options['width'],
-            'height' => $options['height']);
+            'width' => $this->options['width'],
+            'height' => $this->options['height']);
         extract(shortcode_atts($defaults, $atts));
 
         // Create a div to show the map.
@@ -248,39 +255,37 @@ class Gpxpress
      * Name value must start with the same as the id used in register_setting.
      */
     public function path_colour_input() {
-        $options = get_option('gpxpress_options');
-    	echo "<input id='path_colour' name='gpxpress_options[path_colour]' size='40' type='text' value='{$options['path_colour']}' />";
+    	echo "<input id='path_colour' name='gpxpress_options[path_colour]' size='40' type='text' value='{$this->options['path_colour']}' />";
     }
 
     public function width_input() {
-        $options = get_option('gpxpress_options');
-        echo "<input id='width' name='gpxpress_options[width]' size='40' type='text' value='{$options['width']}' />";
+        echo "<input id='width' name='gpxpress_options[width]' size='40' type='text' value='{$this->options['width']}' />";
     }
 
     public function height_input() {
-        $options = get_option('gpxpress_options');
-        echo "<input id='height' name='gpxpress_options[height]' size='40' type='text' value='{$options['height']}' />";
+        echo "<input id='height' name='gpxpress_options[height]' size='40' type='text' value='{$this->options['height']}' />";
     }
 
     public function validate_options($input) {
-        $options = get_option('gpxpress_options');
+
+        // TODO: Do we need to list all options here or only those that we want to validate?
 
         // Validate path colour
-        $options['path_colour'] = $input['path_colour'];
+        $this->options['path_colour'] = $input['path_colour'];
 
         // Validate width and height
         if ($input['width'] < 0) {
-            $options['width'] = 0;
+            $this->options['width'] = 0;
         } else {
-            $options['width'] = $input['width'];
+            $this->options['width'] = $input['width'];
         }
         if ($input['height'] < 0) {
-            $options['height'] = 0;
+            $this->options['height'] = 0;
         } else {
-            $options['height'] = $input['height'];
+            $this->options['height'] = $input['height'];
         }
 
-        return $options;
+        return $this->options;
     }
 }
 

@@ -37,9 +37,6 @@ include_once GPXPRESS_PLUGIN_DIR . 'includes/Gpxpress.php';
 // The main plugin class
 $gpxpress = new Gpxpress();
 
-// Hooks
-register_activation_hook(__FILE__, array($gpxpress, 'on_activate'));
-
 // Actions
 add_action('wp_enqueue_scripts', array($gpxpress, 'wp_enqueue_scripts'));
 add_action('wp_footer', array($gpxpress, 'wp_footer'));
