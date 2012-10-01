@@ -133,7 +133,7 @@ class Gpxpress
 
         // Extract the shortcode arguments into local variables named for the attribute keys (setting defaults as required)
         $defaults = array(
-            'src' => null,
+            'src' => GPXPRESS_PLUGIN_DIR . '/demo.gpx',
             'width' => $this->options['width'],
             'height' => $this->options['height']);
         extract(shortcode_atts($defaults, $atts));

@@ -33,7 +33,8 @@ Use the 'width' and 'height' parameters to give the width and height of the map 
 == Changelog ==
 
 = 1.1 =
-*
+* Bug Fix: Fix option handling code for upgrades.
+* Enhancement: Add default demo.gpx for when src is not specified in [gpxpress] shortcode.
 
 = 1.0 =
 * Enhancement: Add GPX mime type to allowed uploads.
