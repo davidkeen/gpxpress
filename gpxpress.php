@@ -22,7 +22,7 @@
  * Plugin Name: GPXpress
  * Plugin URI: http://davidkeen.github.com/gpxpress/
  * Description: Display beautiful maps of GPX tracks.
- * Version: 1.0
+ * Version: 1.1
  * Author: David Keen
  * Author URI: http://davidkeen.com
 */

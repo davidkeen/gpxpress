@@ -3,11 +3,11 @@ Contributors: davidkeen
 Tags: geo, gpx, gps, navigation, maps
 Requires at least: 3.0
 Tested up to: 3.4.2
-Stable tag: 1.0
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-WordPress plugin to display GPX tracks.
+Display beautiful maps of GPX tracks.
 
 == Description ==
 
@@ -32,10 +32,13 @@ Use the 'width' and 'height' parameters to give the width and height of the map 
 
 == Changelog ==
 
+= 1.1 =
+*
+
 = 1.0 =
-* Add GPX mime type to allowed uploads.
-* Add default width and height options.
-* Make default track colour magenta.
+* Enhancement: Add GPX mime type to allowed uploads.
+* Enhancement: Add default width and height options.
+* Enhancement: Make default track colour magenta.
 
 = 0.1 =
 * Initial release.
