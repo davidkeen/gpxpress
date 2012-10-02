@@ -77,6 +77,13 @@ class Gpxpress
         // Scripts
         wp_register_script('leaflet-js', 'http://cdn.leafletjs.com/leaflet-0.4/leaflet.js');
         wp_enqueue_script('leaflet-js');
+
+        wp_register_script('icons', plugins_url('js/icons.js', dirname(__FILE__)));
+        wp_enqueue_script('icons');
+        wp_localize_script('icons', 'data', array(
+                'iconPath' => plugins_url('icons', dirname(__FILE__))
+            )
+        );
     }
 
     /**
