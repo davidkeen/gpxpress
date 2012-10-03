@@ -32,6 +32,14 @@ class Gpxpress
     // Format: [[12.34,98.76],[56.78,54.32],...]
     private $latlong = '';
 
+    // The track start latlong ('[12.34,98.76]')
+    private $start = '';
+
+    // The track finish latlong
+    private $finish = '';
+
+    // Default values for all plugin options.
+    // To add a new option just add it to this array.
     private $defaultOptions = array(
         'path_colour' => 'magenta',
         'width' => 600,
@@ -93,6 +101,8 @@ class Gpxpress
      */
     public function wp_footer() {
 
+        // TODO: Extract this into separate file and parameterise.
+
         echo '
             <script type="text/javascript">
             //<![CDATA[
@@ -106,6 +116,11 @@ class Gpxpress
 
             // zoom the map to the polyline
             map.fitBounds(polyline.getBounds());
+
+            // Add markers
+            ' .
+            (!empty($this->start) ? 'L.marker(' . $this->start . ', {icon: startIcon}).addTo(map);' : '') .
+            (!empty($this->finish) ? 'L.marker(' . $this->finish . ', {icon: finishIcon}).addTo(map);' : '') . '
             //]]>
             </script>';
     }
@@ -142,7 +157,9 @@ class Gpxpress
         $defaults = array(
             'src' => GPXPRESS_PLUGIN_DIR . '/demo.gpx',
             'width' => $this->options['width'],
-            'height' => $this->options['height']);
+            'height' => $this->options['height'],
+            'start' => false,
+            'finish' => false);
         extract(shortcode_atts($defaults, $atts));
 
         // Create a div to show the map.
@@ -156,6 +173,13 @@ class Gpxpress
             $pairs[] = '[' . $trkpt['lat'] . ',' . $trkpt['lon'] . ']';
         }
         $this->latlong = '[' . implode(',', $pairs) . ']';
+
+        if ($start) {
+            $this->start = $pairs[0];
+        }
+        if ($finish) {
+            $this->finish = end(array_values($pairs));
+        }
 
         return $ret;
     }
