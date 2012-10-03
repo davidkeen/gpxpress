@@ -43,7 +43,9 @@ class Gpxpress
     private $defaultOptions = array(
         'path_colour' => 'magenta',
         'width' => 600,
-        'height' => 400);
+        'height' => 400,
+        'showStart' => false,
+        'showFinish' => false);
     private $options;
 
     public function __construct() {
@@ -146,7 +148,8 @@ class Gpxpress
      * This shortcode inserts a map of the GPX track.
      * The 'src' parameter should be used to give the url containing the GPX data.
      * The 'width' and 'height' parameters set the width and height of the map in pixels. (Default 600x400)
-     * Eg: [gpxpress src=http://www.example.com/my_file.gpx width=600 height=400]
+     * The 'showStart' and 'showFinish' parameters toggle the start/finish markers.
+     * Eg: [gpxpress src=http://www.example.com/my_file.gpx width=600 height=400 showStart=true showFinish=false]
      *
      * @param string $atts an associative array of attributes.
      * @return string the shortcode output to be inserted into the post body in place of the shortcode itself.
@@ -158,8 +161,8 @@ class Gpxpress
             'src' => GPXPRESS_PLUGIN_DIR . '/demo.gpx',
             'width' => $this->options['width'],
             'height' => $this->options['height'],
-            'start' => false,
-            'finish' => false);
+            'showStart' => $this->options['showStart'],
+            'showFinish' => $this->options['showFinish']);
         extract(shortcode_atts($defaults, $atts));
 
         // Create a div to show the map.
@@ -174,10 +177,11 @@ class Gpxpress
         }
         $this->latlong = '[' . implode(',', $pairs) . ']';
 
-        if ($start) {
+        // Set the start and finish latlongs to be used in the JS later.
+        if ($showStart) {
             $this->start = $pairs[0];
         }
-        if ($finish) {
+        if ($showFinish) {
             $this->finish = end(array_values($pairs));
         }
 
@@ -220,6 +224,8 @@ class Gpxpress
         add_settings_field('path_colour', 'Path colour', array($this, 'path_colour_input'), 'gpxpress', 'general');
         add_settings_field('width', 'Map width', array($this, 'width_input'), 'gpxpress', 'general');
         add_settings_field('height', 'Map height', array($this, 'height_input'), 'gpxpress', 'general');
+        add_settings_field('showStart', 'Show start marker', array($this, 'showStart_input'), 'gpxpress', 'general');
+        add_settings_field('showFinish', 'Show finish marker', array($this, 'showFinish_input'), 'gpxpress', 'general');
     }
 
     /**
@@ -297,6 +303,14 @@ class Gpxpress
         echo "<input id='height' name='gpxpress_options[height]' size='40' type='text' value='{$this->options['height']}' />";
     }
 
+    public function showStart_input() {
+        echo "<input id='showStart' name='gpxpress_options[showStart]' type='checkbox' value='true' " . checked(true, $this->options['showStart'], false) . "/>";
+    }
+
+    public function showFinish_input() {
+        echo "<input id='showFinish' name='gpxpress_options[showFinish]' type='checkbox' value='true' " . checked(true, $this->options['showFinish'], false) . "/>";
+    }
+
     public function validate_options($input) {
 
         // TODO: Do we need to list all options here or only those that we want to validate?
@@ -310,11 +324,24 @@ class Gpxpress
         } else {
             $this->options['width'] = $input['width'];
         }
+
         if ($input['height'] < 0) {
             $this->options['height'] = 0;
         } else {
             $this->options['height'] = $input['height'];
         }
+
+        // If the checkbox has not been checked, we void it
+        if (!isset($input['showStart'])) {
+            $input['showStart'] = null;
+        }
+        // We verify if the input is a boolean value
+        $this->options['showStart'] = ($input['showStart'] == true ? true : false);
+
+        if (!isset($input['showFinish'])) {
+            $input['showFinish'] = null;
+        }
+        $this->options['showFinish'] = ($input['showFinish'] == true ? true : false);
 
         return $this->options;
     }
