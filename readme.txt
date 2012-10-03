@@ -39,11 +39,13 @@ Create an issue in the [GitHub issue tracker](https://github.com/davidkeen/gpxpr
 
 == Screenshots ==
 
-1. Example.
+1. Example post with map.
+2. Settings screen.
 
 == Changelog ==
 
 = 1.1 =
+* Enhancement: Add colour picker for path colour.
 * Enhancement: Add default demo.gpx for when src is not specified in [gpxpress] shortcode.
 * Enhancement: Add options for showing start and finish markers.
 * Bug Fix: Fix option handling code for upgrades.
