@@ -39,6 +39,7 @@ $gpxpress = new Gpxpress();
 
 // Actions
 add_action('wp_enqueue_scripts', array($gpxpress, 'wp_enqueue_scripts'));
+add_action('admin_enqueue_scripts', array($gpxpress, 'admin_enqueue_scripts'));
 add_action('wp_footer', array($gpxpress, 'wp_footer'));
 add_action('admin_menu', array($gpxpress, 'admin_menu'));
 add_action('admin_init', array($gpxpress, 'admin_init'));

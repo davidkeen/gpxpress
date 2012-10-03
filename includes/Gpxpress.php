@@ -190,6 +190,13 @@ class Gpxpress
 
     // TODO: Move admin stuff into separate class.
 
+    public function admin_enqueue_scripts() {
+
+        // Farbtastic for colour picker.
+        wp_enqueue_style('farbtastic');
+        wp_enqueue_script('farbtastic');
+    }
+
     /**
      * admin_init action callback.
      */
@@ -292,15 +299,26 @@ class Gpxpress
      * Name value must start with the same as the id used in register_setting.
      */
     public function path_colour_input() {
-    	echo "<input id='path_colour' name='gpxpress_options[path_colour]' size='40' type='text' value='{$this->options['path_colour']}' />";
+    	echo "<input id='path_colour' name='gpxpress_options[path_colour]' type='text' value='{$this->options['path_colour']}' />";
+        echo "<div id='ilctabscolorpicker'></div>";
+         echo '
+            <script type="text/javascript">
+            //<![CDATA[
+            jQuery(document).ready(function() {
+                jQuery("#ilctabscolorpicker").hide();
+                jQuery("#ilctabscolorpicker").farbtastic("#path_colour");
+                jQuery("#path_colour").click(function(){jQuery("#ilctabscolorpicker").slideToggle()});
+            });
+            //]]>
+            </script>';
     }
 
     public function width_input() {
-        echo "<input id='width' name='gpxpress_options[width]' size='40' type='text' value='{$this->options['width']}' />";
+        echo "<input id='width' name='gpxpress_options[width]' type='text' value='{$this->options['width']}' />";
     }
 
     public function height_input() {
-        echo "<input id='height' name='gpxpress_options[height]' size='40' type='text' value='{$this->options['height']}' />";
+        echo "<input id='height' name='gpxpress_options[height]' type='text' value='{$this->options['height']}' />";
     }
 
     public function showStart_input() {
