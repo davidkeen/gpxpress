@@ -301,14 +301,14 @@ class Gpxpress
      */
     public function path_colour_input() {
     	echo "<input id='path_colour' name='gpxpress_options[path_colour]' type='text' value='{$this->options['path_colour']}' />";
-        echo "<div id='ilctabscolorpicker'></div>";
+        echo "<div id='pathcolourpicker'></div>";
          echo '
             <script type="text/javascript">
             //<![CDATA[
             jQuery(document).ready(function() {
-                jQuery("#ilctabscolorpicker").hide();
-                jQuery("#ilctabscolorpicker").farbtastic("#path_colour");
-                jQuery("#path_colour").click(function(){jQuery("#ilctabscolorpicker").slideToggle()});
+                jQuery("#pathcolourpicker").hide();
+                jQuery("#pathcolourpicker").farbtastic("#path_colour");
+                jQuery("#path_colour").click(function(){jQuery("#pathcolourpicker").slideToggle()});
             });
             //]]>
             </script>';
