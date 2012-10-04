@@ -26,10 +26,10 @@ http://davidkeen.github.com/gpxpress/
 = How do I add a map to a post? =
 
 1. Insert the [gpxpress] shortcode into your post where you want to display the map. Use the 'src' parameter to specify the URL of the GPX track you want to display.
-1. Use the optional 'width' and 'height' parameters to give the width and height of the map in pixels (default is 600x400).
-1. Use the optional 'showStart' and 'showFinish' parameters to display a marker at the start and/or finish of a track (defaults are false).
+1. Use the optional 'width' and 'height' parameters to give the width and height of the map in pixels.
+1. Use the optional 'showstart' and 'showfinish' parameters to display a marker at the start and/or finish of a track.
 
-Eg: [gpxpress src=http://www.example.com/my_file.gpx width=600 height=400 showStart=true showFinish=false].
+Eg: [gpxpress src=http://www.example.com/my_file.gpx width=600 height=400 showstart=true showfinish=false].
 
 You can set the default values for track colour, width, height and start/finish markers in the plugin settings.
 

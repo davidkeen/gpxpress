@@ -44,8 +44,8 @@ class Gpxpress
         'path_colour' => 'magenta',
         'width' => 600,
         'height' => 400,
-        'showStart' => false,
-        'showFinish' => false);
+        'showstart' => false,
+        'showfinish' => false);
     private $options;
 
     public function __construct() {
@@ -161,8 +161,8 @@ class Gpxpress
             'src' => GPXPRESS_PLUGIN_DIR . '/demo.gpx',
             'width' => $this->options['width'],
             'height' => $this->options['height'],
-            'showStart' => $this->options['showStart'],
-            'showFinish' => $this->options['showFinish']);
+            'showstart' => $this->options['showstart'],
+            'showfinish' => $this->options['showfinish']);
         extract(shortcode_atts($defaults, $atts));
 
         // Create a div to show the map.
@@ -178,10 +178,11 @@ class Gpxpress
         $this->latlong = '[' . implode(',', $pairs) . ']';
 
         // Set the start and finish latlongs to be used in the JS later.
-        if ($showStart) {
+        // User submitted attributes will be strings not real booleans which we store in the DB.
+        if ($showstart === true || $showstart === 'true') {
             $this->start = $pairs[0];
         }
-        if ($showFinish) {
+        if ($showfinish === true || $showfinish === 'true') {
             $this->finish = end(array_values($pairs));
         }
 
@@ -229,10 +230,10 @@ class Gpxpress
         //            look at the page in the source to see what the existing ones are.)
         // $args - Additional arguments
         add_settings_field('path_colour', 'Path colour', array($this, 'path_colour_input'), 'gpxpress', 'general');
-        add_settings_field('width', 'Map width', array($this, 'width_input'), 'gpxpress', 'general');
-        add_settings_field('height', 'Map height', array($this, 'height_input'), 'gpxpress', 'general');
-        add_settings_field('showStart', 'Show start marker', array($this, 'showStart_input'), 'gpxpress', 'general');
-        add_settings_field('showFinish', 'Show finish marker', array($this, 'showFinish_input'), 'gpxpress', 'general');
+        add_settings_field('width', 'Map width (in pixels)', array($this, 'width_input'), 'gpxpress', 'general');
+        add_settings_field('height', 'Map height (in pixels)', array($this, 'height_input'), 'gpxpress', 'general');
+        add_settings_field('showstart', 'Show start marker', array($this, 'showstart_input'), 'gpxpress', 'general');
+        add_settings_field('showfinish', 'Show finish marker', array($this, 'showfinish_input'), 'gpxpress', 'general');
     }
 
     /**
@@ -321,12 +322,12 @@ class Gpxpress
         echo "<input id='height' name='gpxpress_options[height]' type='text' value='{$this->options['height']}' />";
     }
 
-    public function showStart_input() {
-        echo "<input id='showStart' name='gpxpress_options[showStart]' type='checkbox' value='true' " . checked(true, $this->options['showStart'], false) . "/>";
+    public function showstart_input() {
+        echo "<input id='showstart' name='gpxpress_options[showstart]' type='checkbox' value='true' " . checked(true, $this->options['showstart'], false) . "/>";
     }
 
-    public function showFinish_input() {
-        echo "<input id='showFinish' name='gpxpress_options[showFinish]' type='checkbox' value='true' " . checked(true, $this->options['showFinish'], false) . "/>";
+    public function showfinish_input() {
+        echo "<input id='showfinish' name='gpxpress_options[showfinish]' type='checkbox' value='true' " . checked(true, $this->options['showfinish'], false) . "/>";
     }
 
     public function validate_options($input) {
@@ -350,16 +351,16 @@ class Gpxpress
         }
 
         // If the checkbox has not been checked, we void it
-        if (!isset($input['showStart'])) {
-            $input['showStart'] = null;
+        if (!isset($input['showstart'])) {
+            $input['showstart'] = null;
         }
         // We verify if the input is a boolean value
-        $this->options['showStart'] = ($input['showStart'] == true ? true : false);
+        $this->options['showstart'] = ($input['showstart'] == true ? true : false);
 
-        if (!isset($input['showFinish'])) {
-            $input['showFinish'] = null;
+        if (!isset($input['showfinish'])) {
+            $input['showfinish'] = null;
         }
-        $this->options['showFinish'] = ($input['showFinish'] == true ? true : false);
+        $this->options['showfinish'] = ($input['showfinish'] == true ? true : false);
 
         return $this->options;
     }
