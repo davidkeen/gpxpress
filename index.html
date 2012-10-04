@@ -19,7 +19,7 @@
     <header>
         <h1>GPXpress</h1>
 
-        <p>A WordPress plugin to display GPX tracks.</p>
+        <p>A WordPress plugin to embed beautiful maps of GPX tracks.</p>
 
         <p class="view"><a href="https://github.com/davidkeen/gpxpress">View the Project on GitHub <small>davidkeen/gpxpress</small></a></p>
         <ul>
@@ -39,15 +39,19 @@
             <li>Extract the zip file and drop the contents in the wp-content/plugins/ directory of your WordPress
                 installation.</li>
             <li>Activate the plugin from the Plugins page.</li>
-            <li>Go to the plugin settings page and choose the colour of your tracks. This may be any valid HTML colour
-                code (default is 'magenta').</li>
         </ol>
         <h3>Usage</h3>
+        
+        <ul>
+            <li>Insert the [gpxpress] shortcode into your post where you want to display the map. Use the 'src' parameter to
+            specify the URL of the GPX track you want to display.</li>
+            <li>Use the optional 'width' and 'height' parameters to give the width and height of the map in pixels (default is
+            600x400).</li>
+            <li>Use the optional 'showStart' and 'showFinish' parameters to display a marker at the start and/or finish of a track (defaults are false).</li>
+        </ul>
 
-        <p>Insert the [gpxpress] shortcode into your post where you want to display the map. Use the 'src' parameter to
-            specify the URL of the GPX track you want to display.
-            Use the 'width' and 'height' parameters to give the width and height of the map in pixels (default is
-            600x400). Eg: <code>[gpxpress src=http://www.example.com/my_file.gpx width=600 height=400]</code></p>
+        <p>Eg: <code>[gpxpress src=http://www.example.com/my_file.gpx width=600 height=400 showStart=true showFinish=false]</code></p>
+        <p>You can set the default values for track colour, width, height and start/finish markers in the plugin settings.</p>
     </section>
 </div>
 <footer>
