@@ -29,7 +29,7 @@
 
 // Constants
 define('GPXPRESS_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('PLUGIN_BASENAME', plugin_basename(__FILE__));
+define('GPXPRESS_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
 // Includes
 include_once GPXPRESS_PLUGIN_DIR . 'includes/Gpxpress.php';
@@ -45,7 +45,7 @@ add_action('admin_menu', array($gpxpress, 'admin_menu'));
 add_action('admin_init', array($gpxpress, 'admin_init'));
 
 // Filters
-add_filter('plugin_action_links_' . PLUGIN_BASENAME, array($gpxpress, 'add_settings_link'));
+add_filter('plugin_action_links_' . GPXPRESS_PLUGIN_BASENAME, array($gpxpress, 'add_settings_link'));
 add_filter('upload_mimes', array($gpxpress, 'add_gpx_mime'));
 
 // Shortcodes
