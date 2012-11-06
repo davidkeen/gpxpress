@@ -77,7 +77,7 @@ class Gpxpress
 
         wp_register_script('icons', plugins_url('js/icons.js', dirname(__FILE__)));
         wp_enqueue_script('icons');
-        wp_localize_script('icons', 'data', array(
+        wp_localize_script('icons', 'iconsData', array(
                 'iconPath' => plugins_url('icons', dirname(__FILE__))
             )
         );
