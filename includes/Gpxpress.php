@@ -20,23 +20,10 @@
 
 class Gpxpress
 {
-    // The name of the div containing the map.
-    const MAP_DIV = 'gpxpressMap';
-
     // MapQuest tile layer
     const OMQ_TILE_LAYER = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png';
     const OMQ_ATTRIBUTION = 'Data, imagery and map information provided by <a href=\"http://open.mapquest.co.uk\" target=\"_blank\">MapQuest</a>';
     const OMQ_SUBDOMAINS = '["otile1","otile2","otile3","otile4"]';
-
-    // String containing a JS array of latlong pairs, parsed from the GPX file in the shortcode handler.
-    // Format: [[12.34,98.76],[56.78,54.32],...]
-    private $latlong = '';
-
-    // The track start latlong ('[12.34,98.76]')
-    private $start = '';
-
-    // The track finish latlong
-    private $finish = '';
 
     // Default values for all plugin options.
     // To add a new option just add it to this array.
@@ -94,37 +81,9 @@ class Gpxpress
                 'iconPath' => plugins_url('icons', dirname(__FILE__))
             )
         );
-    }
 
-    /**
-     * The wp_footer action callback.
-     *
-     * Outputs the javascript to show the map.
-     */
-    public function wp_footer() {
-
-        // TODO: Extract this into separate file and parameterise.
-
-        echo '
-            <script type="text/javascript">
-            //<![CDATA[
-            var map = L.map("' . self::MAP_DIV . '");
-            L.tileLayer("' . self::OMQ_TILE_LAYER . '", {
-                attribution: "' . self::OMQ_ATTRIBUTION . '",
-                maxZoom: 18,
-                subdomains: ' . self::OMQ_SUBDOMAINS . '
-            }).addTo(map);
-            var polyline = L.polyline(' . $this->latlong . ', {color: "' . $this->options['path_colour'] . '"}).addTo(map);
-
-            // zoom the map to the polyline
-            map.fitBounds(polyline.getBounds());
-
-            // Add markers
-            ' .
-            (!empty($this->start) ? 'L.marker(' . $this->start . ', {icon: startIcon}).addTo(map);' : '') .
-            (!empty($this->finish) ? 'L.marker(' . $this->finish . ', {icon: finishIcon}).addTo(map);' : '') . '
-            //]]>
-            </script>';
+        // Register the map script for later enqueing in the shortcode handler.
+        wp_register_script('gpxpress', plugins_url('js/gpxpress.js', dirname(__FILE__)));
     }
 
     /**
@@ -156,6 +115,9 @@ class Gpxpress
      */
     public function gpxpress_shortcode($atts) {
 
+        static $divCount = 1;
+        $divId = 'gpxpressMap_' . $divCount;
+
         // Extract the shortcode arguments into local variables named for the attribute keys (setting defaults as required)
         $defaults = array(
             'src' => GPXPRESS_PLUGIN_DIR . '/demo.gpx',
@@ -166,30 +128,44 @@ class Gpxpress
         extract(shortcode_atts($defaults, $atts));
 
         // Create a div to show the map.
-        $ret = '<div id="' . self::MAP_DIV .'" style="width: ' . $width . 'px; height: ' . $height .'px">&#160;</div>';
+        $ret = '<div id="' . $divId .'" style="width: ' . $width . 'px; height: ' . $height .'px">&#160;</div>';
+        $divCount++;
 
-        // Parse the latlongs from the GPX and save them to a global variable to be used in the JS later.
+        // Parse the latlongs from the GPX to a JS array
         // String format: [[12.34,98.76],[56.78,54.32]]
         $pairs = array();
         $xml = simplexml_load_file($src);
         foreach ($xml->trk->trkseg->trkpt as $trkpt) {
             $pairs[] = '[' . $trkpt['lat'] . ',' . $trkpt['lon'] . ']';
         }
-        $this->latlong = '[' . implode(',', $pairs) . ']';
+        $latlong = '[' . implode(',', $pairs) . ']';
 
-        // Set the start and finish latlongs to be used in the JS later.
-        // User submitted attributes will be strings not real booleans which we store in the DB.
-        if ($showstart === true || $showstart === 'true') {
-            $this->start = $pairs[0];
-        }
-        if ($showfinish === true || $showfinish === 'true') {
-            $this->finish = end(array_values($pairs));
-        }
+        // The track start latlong ('[12.34,98.76]')
+        $start = $pairs[0];
+
+        // The track finish latlong
+        $finish = end(array_values($pairs));
+
+        // The javascript
+        wp_enqueue_script('gpxpress');
+        wp_localize_script('gpxpress', 'data', array(
+                'div' => $divId,
+                'tileLayer' => self::OMQ_TILE_LAYER,
+                'tileAttribution' => self::OMQ_ATTRIBUTION,
+                'tileSubdomains' => self::OMQ_SUBDOMAINS,
+                'pathColour' => $this->options['path_colour'],
+                'latLong' => $latlong,
+                'start' => $start,
+                'finish' => $finish,
+
+                // User submitted attributes will be strings not real booleans which we store in the DB.
+                'addStart' => $showstart === true || $showstart === 'true',
+                'addFinish' => $showfinish === true || $showfinish === 'true'
+            )
+        );
 
         return $ret;
     }
-
-    // TODO: Move admin stuff into separate class.
 
     public function admin_enqueue_scripts() {
 

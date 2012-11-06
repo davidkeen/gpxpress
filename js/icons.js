@@ -1,3 +1,5 @@
+// wp_localize_script will pass in 'data' var.
+
 var MapIcon = L.Icon.extend({
     options: {
         shadowUrl: data.iconPath + '/shadow.png',
