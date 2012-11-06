@@ -81,9 +81,6 @@ class Gpxpress
                 'iconPath' => plugins_url('icons', dirname(__FILE__))
             )
         );
-
-        // Register the map script for later enqueing in the shortcode handler.
-        wp_register_script('gpxpress', plugins_url('js/gpxpress.js', dirname(__FILE__)));
     }
 
     /**
@@ -115,8 +112,8 @@ class Gpxpress
      */
     public function gpxpress_shortcode($atts) {
 
-        static $divCount = 1;
-        $divId = 'gpxpressMap_' . $divCount;
+        static $mapCount = 0;
+        $divId = 'gpxpressMap_' . ++$mapCount;
 
         // Extract the shortcode arguments into local variables named for the attribute keys (setting defaults as required)
         $defaults = array(
@@ -129,7 +126,6 @@ class Gpxpress
 
         // Create a div to show the map.
         $ret = '<div id="' . $divId .'" style="width: ' . $width . 'px; height: ' . $height .'px">&#160;</div>';
-        $divCount++;
 
         // Parse the latlongs from the GPX to a JS array
         // String format: [[12.34,98.76],[56.78,54.32]]
@@ -147,22 +143,44 @@ class Gpxpress
         $finish = end(array_values($pairs));
 
         // The javascript
-        wp_enqueue_script('gpxpress');
-        wp_localize_script('gpxpress', 'data', array(
-                'div' => $divId,
-                'tileLayer' => self::OMQ_TILE_LAYER,
-                'tileAttribution' => self::OMQ_ATTRIBUTION,
-                'tileSubdomains' => self::OMQ_SUBDOMAINS,
-                'pathColour' => $this->options['path_colour'],
-                'latLong' => $latlong,
-                'start' => $start,
-                'finish' => $finish,
+        // We need to produce the javascript in the shortcode as we may have more than one map per page.
+        // We use global js 'map' and 'polyline' vars here. This seems to work fine with multiple maps per page...
+        $ret .= '
+            <script type="text/javascript">
+            //<![CDATA[
+            var map = L.map("' . $divId . '");
+            L.tileLayer("' . self::OMQ_TILE_LAYER . '", {
+                attribution: "' . self::OMQ_ATTRIBUTION . '",
+                maxZoom: 18,
+                subdomains: ' . self::OMQ_SUBDOMAINS . '
+            }).addTo(map);
+            var polyline = L.polyline(' . $latlong . ', {color: "' . $this->options['path_colour'] . '"}).addTo(map);
 
-                // User submitted attributes will be strings not real booleans which we store in the DB.
-                'addStart' => $showstart === true || $showstart === 'true',
-                'addFinish' => $showfinish === true || $showfinish === 'true'
-            )
-        );
+            // zoom the map to the polyline
+            map.fitBounds(polyline.getBounds());
+            //]]>
+            </script>
+        ';
+
+        // Add markers if required (user submitted attributes will be strings not real booleans which we store in the DB)
+        if ($showstart === true || $showstart === 'true') {
+            $ret .= '
+            <script type="text/javascript">
+            //<![CDATA[
+            L.marker(' . $start . ', {icon: startIcon}).addTo(map);
+            //]]>
+            </script>
+            ';
+        }
+        if ($showfinish === true || $showfinish === 'true') {
+            $ret .= '
+            <script type="text/javascript">
+            //<![CDATA[
+            L.marker(' . $finish . ', {icon: finishIcon}).addTo(map);
+            //]]>
+            </script>
+            ';
+        }
 
         return $ret;
     }
