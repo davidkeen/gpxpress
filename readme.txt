@@ -48,6 +48,9 @@ Create an issue in the [GitHub issue tracker](https://github.com/davidkeen/gpxpr
 
 == Changelog ==
 
+= 1.2 =
+* Bug Fix: Allow multiple maps per page.
+
 = 1.1 =
 * Enhancement: Add colour picker for path colour.
 * Enhancement: Add default demo.gpx for when src is not specified in [gpxpress] shortcode.
