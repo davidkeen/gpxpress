@@ -1,20 +1,20 @@
-// wp_localize_script will pass in 'data' var.
+// wp_localize_script will pass in 'gpxpressData' var.
 
-var map = L.map(data.div);
-L.tileLayer(data.tileLayer, {
-    attribution: data.tileAttribution,
+var map = L.map(gpxpressData.div);
+L.tileLayer(gpxpressData.tileLayer, {
+    attribution: gpxpressData.tileAttribution,
     maxZoom: 18,
-    subdomains: data.tileSubdomains
+    subdomains: gpxpressData.tileSubdomains
 }).addTo(map);
-var polyline = L.polyline(data.latLong, {color: data.pathColour}).addTo(map);
+var polyline = L.polyline(gpxpressData.latLong, {color: gpxpressData.pathColour}).addTo(map);
 
 // zoom the map to the polyline
 map.fitBounds(polyline.getBounds());
 
 // Add markers
-if (data.addStart) {
-    L.marker(data.start, {icon: startIcon}).addTo(map);
+if (gpxpressData.addStart) {
+    L.marker(gpxpressData.start, {icon: startIcon}).addTo(map);
 }
-if (data.addFinish) {
-    L.marker(data.finish, {icon: finishIcon}).addTo(map);
+if (gpxpressData.addFinish) {
+    L.marker(gpxpressData.finish, {icon: finishIcon}).addTo(map);
 }
