@@ -21,9 +21,12 @@
 class Gpxpress
 {
     // MapQuest tile layer
-    const OMQ_TILE_LAYER = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png';
-    const OMQ_ATTRIBUTION = 'Data, imagery and map information provided by <a href=\"http://open.mapquest.co.uk\" target=\"_blank\">MapQuest</a>';
-    const OMQ_SUBDOMAINS = '["otile1","otile2","otile3","otile4"]';
+    const MQ_TILE_ATTRIBUTION = 'Tiles Courtesy of <a href=\"http://www.mapquest.com/\" target=\"_blank\">MapQuest</a> <img src=\"http://developer.mapquest.com/content/osm/mq_logo.png\">';
+    const MQ_SUBDOMAINS = '["otile1","otile2","otile3","otile4"]';
+    const MQ_OSM_TILE_LAYER = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png';
+    const MQ_AERIAL_TILE_LAYER = 'http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png';
+    const MQ_OSM_ATTRIBUTION = '© OpenStreetMap';
+    const MQ_AERIAL_ATTRIBUTION = 'Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency';
 
     // Default values for all plugin options.
     // To add a new option just add it to this array.
@@ -34,6 +37,7 @@ class Gpxpress
         'showstart' => false,
         'showfinish' => false);
     private $options;
+
 
     public function __construct() {
 
@@ -169,10 +173,10 @@ class Gpxpress
             <script type="text/javascript">
             //<![CDATA[
             var map = L.map("' . $divId . '");
-            L.tileLayer("' . self::OMQ_TILE_LAYER . '", {
-                attribution: "' . self::OMQ_ATTRIBUTION . '",
+            L.tileLayer("' . self::MQ_OSM_TILE_LAYER . '", {
+                attribution: "' . self::MQ_OSM_ATTRIBUTION . ' | ' . self::MQ_TILE_ATTRIBUTION . '",
                 maxZoom: 18,
-                subdomains: ' . self::OMQ_SUBDOMAINS . '
+                subdomains: ' . self::MQ_SUBDOMAINS . '
             }).addTo(map);
             var polyline = L.polyline(' . $latlong . ', {color: "' . $this->options['path_colour'] . '"}).addTo(map);
 
