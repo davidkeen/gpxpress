@@ -61,6 +61,23 @@ class Gpxpress
     }
 
     /**
+     * Checks if the shortcode is used in the page.
+     * Adapted from code by Ian Dunn <ian@iandunn.name>.
+     *
+     * @param $posts the posts
+     * @return bool true if the shortcode is used.
+     */
+    private function shortcodeCalled($posts) {
+        foreach ($posts as $p) {
+            preg_match('/'. get_shortcode_regex() .'/s', $p->post_content, $matches);
+            if (is_array($matches) && array_key_exists(2, $matches) && $matches[2] == 'gpxpress') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * The wp_enqueue_scripts action callback.
      * This is the hook to use when enqueuing items that are meant to appear on the front end.
      * Despite the name, it is used for enqueuing both scripts and styles.
@@ -69,18 +86,21 @@ class Gpxpress
 
         // Styles
         wp_register_style('leaflet-css', 'http://cdn.leafletjs.com/leaflet-0.7/leaflet.css');
-        wp_enqueue_style('leaflet-css');
 
         // Scripts
         wp_register_script('leaflet-js', 'http://cdn.leafletjs.com/leaflet-0.7/leaflet.js');
-        wp_enqueue_script('leaflet-js');
-
         wp_register_script('icons', plugins_url('js/icons.js', dirname(__FILE__)));
-        wp_enqueue_script('icons');
-        wp_localize_script('icons', 'iconsData', array(
-                'iconPath' => plugins_url('icons', dirname(__FILE__))
-            )
-        );
+
+        // Only enqueue the scripts if the shortcode is used.
+        global $posts;
+        if ($this->shortcodeCalled($posts)) {
+            wp_enqueue_style('leaflet-css');
+            wp_enqueue_script('leaflet-js');
+
+            wp_enqueue_script('icons');
+            wp_localize_script('icons', 'iconsData', array(
+                'iconPath' => plugins_url('icons', dirname(__FILE__))));
+        }
     }
 
     /**
