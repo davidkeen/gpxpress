@@ -3,7 +3,7 @@ Contributors: davidkeen
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2ZJAG8WMAXLD2
 Tags: geo, gpx, gps, navigation, maps
 Requires at least: 3.0
-Tested up to: 3.4.2
+Tested up to: 3.8
 Stable tag: 1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -49,7 +49,9 @@ Create an issue in the [GitHub issue tracker](https://github.com/davidkeen/gpxpr
 == Changelog ==
 
 = 1.3 =
-* 
+* Enhancement: Update leaflet library to 0.7.
+* Enhancement: Add aerial map layer.
+* Enhancement: Only include javascript on pages that use the shortcode.
 
 = 1.2 =
 * Enhancement: Allow multiple maps per page.
