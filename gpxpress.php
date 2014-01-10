@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright 2012 David Keen <david@davidkeen.com>
+ * Copyright 2012-2014 David Keen <david@davidkeen.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
  * Plugin Name: GPXpress
  * Plugin URI: http://davidkeen.github.com/gpxpress/
  * Description: Embed beautiful maps of GPX tracks.
- * Version: 1.3
+ * Version: 1.4
  * Author: David Keen
  * Author URI: http://davidkeen.com
 */

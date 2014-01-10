@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright 2012 David Keen <david@davidkeen.com>
+ * Copyright 2012-2014 David Keen <david@davidkeen.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
