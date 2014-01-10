@@ -68,11 +68,11 @@ class Gpxpress
     public function wp_enqueue_scripts() {
 
         // Styles
-        wp_register_style('leaflet-css', 'http://cdn.leafletjs.com/leaflet-0.4/leaflet.css');
+        wp_register_style('leaflet-css', 'http://cdn.leafletjs.com/leaflet-0.7/leaflet.css');
         wp_enqueue_style('leaflet-css');
 
         // Scripts
-        wp_register_script('leaflet-js', 'http://cdn.leafletjs.com/leaflet-0.4/leaflet.js');
+        wp_register_script('leaflet-js', 'http://cdn.leafletjs.com/leaflet-0.7/leaflet.js');
         wp_enqueue_script('leaflet-js');
 
         wp_register_script('icons', plugins_url('js/icons.js', dirname(__FILE__)));
