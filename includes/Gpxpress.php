@@ -172,12 +172,25 @@ class Gpxpress
         $ret .= '
             <script type="text/javascript">
             //<![CDATA[
-            var map = L.map("' . $divId . '");
-            L.tileLayer("' . self::MQ_OSM_TILE_LAYER . '", {
+            var osmLayer = L.tileLayer("' . self::MQ_OSM_TILE_LAYER . '", {
                 attribution: "' . self::MQ_OSM_ATTRIBUTION . ' | ' . self::MQ_TILE_ATTRIBUTION . '",
                 maxZoom: 18,
                 subdomains: ' . self::MQ_SUBDOMAINS . '
-            }).addTo(map);
+            });
+            var aerialLayer = L.tileLayer("' . self::MQ_AERIAL_TILE_LAYER . '", {
+                attribution: "' . self::MQ_AERIAL_ATTRIBUTION . ' | ' . self::MQ_TILE_ATTRIBUTION . '",
+                maxZoom: 11,
+                subdomains: ' . self::MQ_SUBDOMAINS . '
+            });
+
+            var map = L.map("' . $divId . '", {layers: [osmLayer]});
+
+            var baseMaps = {
+                "OpenStreetMap": osmLayer,
+                "Aerial": aerialLayer
+            };
+            L.control.layers(baseMaps).addTo(map);
+
             var polyline = L.polyline(' . $latlong . ', {color: "' . $this->options['path_colour'] . '"}).addTo(map);
 
             // zoom the map to the polyline
