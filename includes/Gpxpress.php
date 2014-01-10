@@ -179,7 +179,7 @@ class Gpxpress
             });
             var aerialLayer = L.tileLayer("' . self::MQ_AERIAL_TILE_LAYER . '", {
                 attribution: "' . self::MQ_AERIAL_ATTRIBUTION . ' | ' . self::MQ_TILE_ATTRIBUTION . '",
-                maxZoom: 11,
+                maxZoom: 18,
                 subdomains: ' . self::MQ_SUBDOMAINS . '
             });
 
