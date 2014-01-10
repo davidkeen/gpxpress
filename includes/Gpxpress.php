@@ -25,7 +25,7 @@ class Gpxpress
     const MQ_SUBDOMAINS = '["otile1","otile2","otile3","otile4"]';
     const MQ_OSM_TILE_LAYER = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png';
     const MQ_AERIAL_TILE_LAYER = 'http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png';
-    const MQ_OSM_ATTRIBUTION = '© OpenStreetMap';
+    const MQ_OSM_ATTRIBUTION = '&copy; OpenStreetMap';
     const MQ_AERIAL_ATTRIBUTION = 'Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency';
 
     // Default values for all plugin options.
