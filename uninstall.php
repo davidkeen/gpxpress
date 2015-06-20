@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-if (!defined('WP_UNINSTALL_PLUGIN')) {
-    exit();
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+	exit();
 }
-delete_option('gpxpress_options');
+delete_option( 'gpxpress_options' );
