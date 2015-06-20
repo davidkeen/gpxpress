@@ -144,85 +144,87 @@ class Gpxpress {
 		static $mapCount = 0;
 		$divId = 'gpxpressMap_' . ++ $mapCount;
 
-		// Extract the shortcode arguments into local variables named for the attribute keys (setting defaults as required)
+		// Merge the shortcode arguments setting defaults as required
 		$defaults = array(
-			'src'        => GPXPRESS_PLUGIN_DIR . '/demo.gpx',
+			'src'        => GPXPRESS_PLUGIN_DIR . 'demo.gpx',
 			'width'      => $this->options['width'],
 			'height'     => $this->options['height'],
 			'showstart'  => $this->options['showstart'],
 			'showfinish' => $this->options['showfinish']
 		);
-		extract( shortcode_atts( $defaults, $atts ) );
+		$gpxAtts  = shortcode_atts( $defaults, $atts );
 
 		// Create a div to show the map.
-		$ret = '<div id="' . $divId . '" style="width: ' . $width . 'px; height: ' . $height . 'px">&#160;</div>';
+		$ret = '<div id="' . $divId . '" style="width: ' . $gpxAtts['width'] . 'px; height: ' . $gpxAtts['height'] . 'px">&#160;</div>';
 
 		// Parse the latlongs from the GPX to a JS array
 		// String format: [[12.34,98.76],[56.78,54.32]]
 		$pairs = array();
-		$xml   = simplexml_load_file( $src );
-		foreach ( $xml->trk->trkseg->trkpt as $trkpt ) {
-			$pairs[] = '[' . $trkpt['lat'] . ',' . $trkpt['lon'] . ']';
-		}
-		$latlong = '[' . implode( ',', $pairs ) . ']';
+		$xml   = simplexml_load_file( $gpxAtts['src'] );
+		if ( $xml ) {
+			foreach ( $xml->trk->trkseg->trkpt as $trkpt ) {
+				$pairs[] = '[' . $trkpt['lat'] . ',' . $trkpt['lon'] . ']';
+			}
+			$latlong = '[' . implode( ',', $pairs ) . ']';
 
-		// The track start latlong ('[12.34,98.76]')
-		$start = $pairs[0];
+			// The track start latlong ('[12.34,98.76]')
+			$start = $pairs[0];
 
-		// The track finish latlong
-		$finish = end( array_values( $pairs ) );
+			// The track finish latlong
+			$finish = $pairs[ count( $pairs ) - 1 ];
 
-		// The javascript
-		// We need to produce the javascript in the shortcode as we may have more than one map per page.
-		// We use global js 'map' and 'polyline' vars here. This seems to work fine with multiple maps per page...
-		$ret .= '
-            <script type="text/javascript">
-            //<![CDATA[
-            var osmLayer = L.tileLayer("' . self::MQ_OSM_TILE_LAYER . '", {
-                attribution: "' . self::MQ_OSM_ATTRIBUTION . ' | ' . self::MQ_TILE_ATTRIBUTION . '",
-                maxZoom: 18,
-                subdomains: ' . self::MQ_SUBDOMAINS . '
-            });
-            var aerialLayer = L.tileLayer("' . self::MQ_AERIAL_TILE_LAYER . '", {
-                attribution: "' . self::MQ_AERIAL_ATTRIBUTION . ' | ' . self::MQ_TILE_ATTRIBUTION . '",
-                maxZoom: 18,
-                subdomains: ' . self::MQ_SUBDOMAINS . '
-            });
-
-            var map = L.map("' . $divId . '", {layers: [osmLayer]});
-
-            var baseMaps = {
-                "OpenStreetMap": osmLayer,
-                "Aerial": aerialLayer
-            };
-            L.control.layers(baseMaps).addTo(map);
-
-            var polyline = L.polyline(' . $latlong . ', {color: "' . $this->options['path_colour'] . '"}).addTo(map);
-
-            // zoom the map to the polyline
-            map.fitBounds(polyline.getBounds());
-            //]]>
-            </script>
-        ';
-
-		// Add markers if required (user submitted attributes will be strings not real booleans which we store in the DB)
-		if ( $showstart === true || $showstart === 'true' ) {
+			// The javascript
+			// We need to produce the javascript in the shortcode as we may have more than one map per page.
+			// We use global js 'map' and 'polyline' vars here. This seems to work fine with multiple maps per page...
 			$ret .= '
-            <script type="text/javascript">
-            //<![CDATA[
-            L.marker(' . $start . ', {icon: startIcon}).addTo(map);
-            //]]>
-            </script>
-            ';
-		}
-		if ( $showfinish === true || $showfinish === 'true' ) {
-			$ret .= '
-            <script type="text/javascript">
-            //<![CDATA[
-            L.marker(' . $finish . ', {icon: finishIcon}).addTo(map);
-            //]]>
-            </script>
-            ';
+	            <script type="text/javascript">
+	            //<![CDATA[
+	            var osmLayer = L.tileLayer("' . self::MQ_OSM_TILE_LAYER . '", {
+	                attribution: "' . self::MQ_OSM_ATTRIBUTION . ' | ' . self::MQ_TILE_ATTRIBUTION . '",
+	                maxZoom: 18,
+	                subdomains: ' . self::MQ_SUBDOMAINS . '
+	            });
+	            var aerialLayer = L.tileLayer("' . self::MQ_AERIAL_TILE_LAYER . '", {
+	                attribution: "' . self::MQ_AERIAL_ATTRIBUTION . ' | ' . self::MQ_TILE_ATTRIBUTION . '",
+	                maxZoom: 18,
+	                subdomains: ' . self::MQ_SUBDOMAINS . '
+	            });
+
+	            var map = L.map("' . $divId . '", {layers: [osmLayer]});
+
+	            var baseMaps = {
+	                "OpenStreetMap": osmLayer,
+	                "Aerial": aerialLayer
+	            };
+	            L.control.layers(baseMaps).addTo(map);
+
+	            var polyline = L.polyline(' . $latlong . ', {color: "' . $this->options['path_colour'] . '"}).addTo(map);
+
+	            // zoom the map to the polyline
+	            map.fitBounds(polyline.getBounds());
+	            //]]>
+	            </script>
+	        ';
+
+			// Add markers if required (user submitted attributes will be strings not real booleans which we store in the DB)
+			if ( $gpxAtts['showstart'] === true || $gpxAtts['showstart'] === 'true' ) {
+				$ret .= '
+	            <script type="text/javascript">
+	            //<![CDATA[
+	            L.marker(' . $start . ', {icon: startIcon}).addTo(map);
+	            //]]>
+	            </script>
+	            ';
+			}
+			if ( $gpxAtts['showfinish'] === true || $gpxAtts['showfinish'] === 'true' ) {
+				$ret .= '
+	            <script type="text/javascript">
+	            //<![CDATA[
+	            L.marker(' . $finish . ', {icon: finishIcon}).addTo(map);
+	            //]]>
+	            </script>
+	            ';
+			}
 		}
 
 		return $ret;
