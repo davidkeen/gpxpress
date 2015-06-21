@@ -146,7 +146,7 @@ class Gpxpress {
 
 		// Merge the shortcode arguments setting defaults as required
 		$defaults = array(
-			'src'        => GPXPRESS_PLUGIN_DIR . 'demo.gpx',
+			'src'        => GPXPRESS_PLUGIN_URL . 'demo.gpx',
 			'width'      => $this->options['width'],
 			'height'     => $this->options['height'],
 			'showstart'  => $this->options['showstart'],
